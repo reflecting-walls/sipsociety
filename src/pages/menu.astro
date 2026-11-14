@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import MenuItem from '../components/MenuItem.astro';
+import { drinks } from '../data/menu';
+---
+
+<Base title="Menu" description="The Sip Society menu: hot chocolate, pink lemonade, berry smoothies and caffeine-free babyccinos in small, medium and large, with ingredients, calories and prices.">
+  <section class="intro">
+    <div class="container center">
+      <p class="eyebrow">Our menu</p>
+      <h1>Sips for every <span class="script">little mood</span></h1>
+      <p class="lead">Every drink comes in three sizes. Pick one to see its price and calories, then add it to your order.</p>
+      <nav class="jump" aria-label="Menu sections">
+        {drinks.map((d) => <a href={`#${d.id}`}>{d.category}</a>)}
+      </nav>
+    </div>
+  </section>
+
+  <div class="container">
+    {drinks.map((d, i) => <MenuItem drink={d} index={i} />)}
+  </div>
+
+  <section class="section section--blush">
+    <div class="container center small">
+      <h2>Good to know</h2>
+      <p>Calories are approximate and based on whole milk. Oat milk is available on request for any milk-based drink. Please tell us about allergies when you order, as all drinks are made in a shared kitchen.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro { background: linear-gradient(180deg, var(--blush), var(--white)); padding-block: clamp(56px, 8vw, 96px) 32px; }
+  .jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 28px; }
+  .jump a {
+    padding: 10px 20px;
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--white);
+  }
+  .jump a:hover { background: var(--blush); color: var(--rose); }
+  .small { max-width: 44rem; }
+  .small p { color: var(--muted); }
+</style>

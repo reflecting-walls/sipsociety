@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Berry smoothie">
+  <circle cx="200" cy="200" r="190" fill="#F6E8F3"/>
+  <circle cx="200" cy="200" r="172" fill="none" stroke="#D4B483" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"/>
+  <ellipse cx="200" cy="334" rx="92" ry="14" fill="#E6CFE0"/>
+  <path d="M222 40l-14 86" stroke="#D4B483" stroke-width="12" stroke-linecap="round"/>
+  <path d="M128 126h144l-18 196a14 14 0 0 1-14 12h-80a14 14 0 0 1-14-12z" fill="#fff" stroke="#E6D2B0" stroke-width="4"/>
+  <path d="M134 150h132l-15 168a10 10 0 0 1-10 9h-82a10 10 0 0 1-10-9z" fill="#C86A92"/>
+  <path d="M137 190h126l-4 50H141z" fill="#E594B1"/>
+  <path d="M142 260h116l-4 30H146z" fill="#9E5B9C" opacity=".55"/>
+  <path d="M118 134c0-30 30-40 50-30 10-22 54-22 64 0 20-10 50 0 50 30z" fill="#F4AFC0"/>
+  <path d="M126 130c6-14 22-18 34-12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>
+  <g transform="translate(262 108) rotate(20)">
+    <path d="M0 -26c22 0 30 18 22 34-6 12-16 20-22 22-6-2-16-10-22-22-8-16 0-34 22-34z" fill="#E2465E"/>
+    <path d="M-14-28c6 6 10 6 14 0 4 6 8 6 14 0-2 8-6 10-14 10s-12-2-14-10z" fill="#5FA05A"/>
+    <g fill="#FCE38A"><circle cx="-8" cy="-6" r="2"/><circle cx="8" cy="-4" r="2"/><circle cx="0" cy="8" r="2"/><circle cx="-10" cy="10" r="2"/><circle cx="10" cy="12" r="2"/></g>
+  </g>
+  <g fill="#5B5FB0"><circle cx="150" cy="106" r="10"/><circle cx="166" cy="98" r="8"/></g>
+  <g fill="#D4B483"><circle cx="92" cy="140" r="5"/><circle cx="100" cy="292" r="4"/><circle cx="316" cy="276" r="5"/></g>
+</svg>

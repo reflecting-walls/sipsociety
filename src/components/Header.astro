@@ -1,0 +1,108 @@
+---
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/menu/', label: 'Menu' },
+  { href: '/about/', label: 'About' },
+];
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href.replace(/\/$/, '')));
+---
+
+<div class="announce">Kid-sized sips · real ingredients · <a href="/menu/">see the menu</a></div>
+<header class="site-header">
+  <div class="container bar">
+    <a class="brand" href="/" aria-label="Sip Society home">
+      <img src="/images/logo-160.webp" width="64" height="64" alt="" />
+      <span class="wordmark">Sip Society</span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {links.map((l) => (
+          <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <button class="cart-btn" type="button" data-cart-open aria-label="Open your order">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="cart-label">Order</span>
+      <span class="cart-count" data-cart-count hidden>0</span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .announce {
+    background: var(--ink);
+    color: var(--gold-soft);
+    text-align: center;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 9px 16px;
+  }
+  .announce a { color: var(--gold); }
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; gap: 24px; min-height: 80px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); margin-right: auto; }
+  .brand img { width: 56px; height: 56px; }
+  .wordmark { font: 600 1.6rem/1 var(--serif); letter-spacing: 0.02em; }
+  nav ul { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; }
+  nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    border-bottom: 1px solid transparent;
+  }
+  nav a:hover { color: var(--rose); }
+  nav a[aria-current='page'] { color: var(--rose); border-color: var(--gold); }
+  .cart-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid var(--gold);
+    background: var(--white);
+    color: var(--ink);
+    font: 500 0.78rem/1 var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .cart-btn:hover { background: var(--blush); }
+  .cart-count {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--rose);
+    color: var(--white);
+    font-size: 0.72rem;
+    letter-spacing: 0;
+    display: inline-grid;
+    place-items: center;
+  }
+  .cart-count[hidden] { display: none; }
+
+  @media (max-width: 720px) {
+    .bar { flex-wrap: wrap; gap: 0 12px; min-height: 0; padding-block: 10px; }
+    .brand img { width: 44px; height: 44px; }
+    .wordmark { font-size: 1.35rem; }
+    .cart-label { display: none; }
+    .cart-btn { padding: 0 14px; }
+    nav { order: 3; width: 100%; }
+    nav ul { justify-content: center; gap: 28px; padding-top: 8px; }
+  }
+</style>

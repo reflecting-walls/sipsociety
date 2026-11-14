@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="About" description="Sip Society is a kids' beverage bar founded in 2026 to give little ones a coffee-shop moment of their own, with real ingredients and caffeine-free fun.">
+  <section class="intro">
+    <div class="container center">
+      <p class="eyebrow">Our story</p>
+      <h1>A coffee-shop moment, <span class="script">made for kids</span></h1>
+      <p class="lead">Sip Society began with a simple idea: little ones deserve a special drink of their own, made with the same care as ours.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container story">
+      <div class="art">
+        <img src="/images/logo-720.webp" width="420" height="420" alt="Sip Society logo" loading="lazy" decoding="async" />
+      </div>
+      <div>
+        <h2>How it started</h2>
+        <p>Every weekend, the same scene played out: grown-ups with lattes in hand, and kids asking, “Where’s mine?” We wanted to give them an answer that felt just as grown-up, without the caffeine or the sugar rush.</p>
+        <p>So we built a little beverage bar of our own. Cocoa whisked with real chocolate. Lemonade squeezed fresh and blushed pink with strawberries. Smoothies blended from whole fruit. And a babyccino with all the foam and none of the coffee.</p>
+        <p>Established in 2026, Sip Society is a place for slow mornings, after-school treats and little celebrations, one small sip at a time.</p>
+        <p class="sign">With love, the Sip Society team</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--blush">
+    <div class="container center">
+      <p class="eyebrow">What we believe</p>
+      <h2>Our little promises</h2>
+      <div class="flourish">✦</div>
+      <ol class="promises">
+        <li><span>01</span><h3>Real, simple ingredients</h3><p>If you can’t pronounce it, it isn’t in the cup. Fresh fruit, real cocoa and good milk.</p></li>
+        <li><span>02</span><h3>Less sugar, more flavor</h3><p>We sweeten lightly and let fruit do the work, so a treat still feels like a good choice.</p></li>
+        <li><span>03</span><h3>Safe for small hands</h3><p>Warm drinks served at a kid-safe temperature, in sizes and cups made for little sippers.</p></li>
+        <li><span>04</span><h3>A sprinkle of magic</h3><p>Pink drinks, marshmallow clouds and cocoa hearts. Every order should feel like an occasion.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container center">
+      <h2>Come sip with us</h2>
+      <p>Browse the menu and send us your order, or stop by and say hello.</p>
+      <a class="btn btn--gold" href="/menu/">View the menu</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro { background: linear-gradient(180deg, var(--blush), var(--white)); padding-block: clamp(56px, 8vw, 104px) 24px; }
+  .story { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
+  .art { aspect-ratio: 1; border-radius: 50%; background: var(--cream); box-shadow: 0 0 0 1px var(--gold), var(--shadow); padding: 8%; max-width: 440px; width: 100%; margin-inline: auto; }
+  .story p { color: var(--muted); }
+  .sign { font: italic 500 1.5rem/1.3 var(--serif); color: var(--rose) !important; margin-top: 24px; }
+  .promises { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: left; }
+  .promises li { background: var(--white); border-radius: var(--radius); padding: 32px 26px; }
+  .promises span { font: 500 2.2rem/1 var(--serif); color: var(--gold); display: block; margin-bottom: 14px; }
+  .promises h3 { font-size: 1.45rem; }
+  .promises p { color: var(--muted); margin: 0; font-size: 0.97rem; }
+  .cta { background: var(--ink); color: var(--gold-soft); padding-block: 80px; }
+  .cta h2 { color: var(--white); }
+  .cta p { margin-bottom: 28px; }
+  @media (max-width: 980px) { .promises { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 760px) { .story { grid-template-columns: 1fr; } .art { max-width: 300px; } }
+  @media (max-width: 520px) { .promises { grid-template-columns: 1fr; } }
+</style>

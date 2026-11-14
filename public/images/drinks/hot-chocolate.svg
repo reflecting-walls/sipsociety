@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Hot chocolate">
+  <circle cx="200" cy="200" r="190" fill="#FBEAED"/>
+  <circle cx="200" cy="200" r="172" fill="none" stroke="#D4B483" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"/>
+  <g fill="none" stroke="#D4B483" stroke-width="5" stroke-linecap="round" opacity=".8">
+    <path d="M165 120c-14-16 14-26 0-44"/><path d="M200 112c-14-16 14-26 0-44"/><path d="M235 120c-14-16 14-26 0-44"/>
+  </g>
+  <ellipse cx="200" cy="318" rx="118" ry="16" fill="#EBC9D0"/>
+  <path d="M276 190c40-6 56 20 48 46-8 26-36 36-56 30" fill="none" stroke="#E29AAB" stroke-width="18" stroke-linecap="round"/>
+  <path d="M112 160h176l-14 138a22 22 0 0 1-22 20H148a22 22 0 0 1-22-20z" fill="#E8A6B4"/>
+  <path d="M120 200h160l-3 30H123z" fill="#fff" opacity=".35"/>
+  <ellipse cx="200" cy="160" rx="88" ry="20" fill="#6B3F35"/>
+  <ellipse cx="200" cy="157" rx="80" ry="14" fill="#8A5444"/>
+  <g fill="#fff" stroke="#F2D7DD" stroke-width="2">
+    <rect x="150" y="138" width="26" height="22" rx="6" transform="rotate(-12 163 149)"/>
+    <rect x="182" y="132" width="26" height="22" rx="6" transform="rotate(8 195 143)"/>
+    <rect x="214" y="140" width="26" height="22" rx="6" transform="rotate(-4 227 151)"/>
+    <rect x="236" y="146" width="22" height="18" rx="5" fill="#FBE3E8" transform="rotate(14 247 155)"/>
+    <rect x="166" y="150" width="22" height="18" rx="5" fill="#FBE3E8" transform="rotate(20 177 159)"/>
+  </g>
+  <g fill="#D4B483"><circle cx="96" cy="110" r="5"/><circle cx="310" cy="96" r="4"/><circle cx="320" cy="300" r="5"/></g>
+</svg>

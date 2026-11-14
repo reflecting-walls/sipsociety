@@ -1,0 +1,162 @@
+---
+import { contact } from '../data/menu';
+---
+
+<dialog class="cart" data-cart aria-labelledby="cart-title" data-email={contact.email}>
+  <div class="cart-inner">
+    <header>
+      <h2 id="cart-title">Your order</h2>
+      <button type="button" class="close" data-cart-close aria-label="Close your order">×</button>
+    </header>
+
+    <p class="empty" data-cart-empty>Your order is empty. Pick a sip from the <a href="/menu/">menu</a>.</p>
+    <ul class="lines" data-cart-lines></ul>
+
+    <footer data-cart-footer hidden>
+      <div class="total"><span>Subtotal</span><strong data-cart-total>$0.00</strong></div>
+      <p class="note">Online payment is coming soon. Send your order to us and we'll confirm a pickup time.</p>
+      <a class="btn" data-cart-send href="#">Send order request</a>
+      <button type="button" class="clear" data-cart-clear>Clear order</button>
+    </footer>
+  </div>
+</dialog>
+
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+
+<style>
+  .cart {
+    margin: 0 0 0 auto;
+    height: 100dvh;
+    max-height: none;
+    width: min(100%, 420px);
+    border: 0;
+    padding: 0;
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: -20px 0 50px -30px rgba(58, 43, 48, 0.4);
+  }
+  .cart::backdrop { background: rgba(58, 43, 48, 0.35); }
+  .cart[open] { animation: slide 0.25s ease-out; }
+  @keyframes slide { from { transform: translateX(40px); opacity: 0; } }
+  .cart-inner { display: flex; flex-direction: column; height: 100%; padding: 28px; }
+  header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 18px; }
+  h2 { font-size: 2rem; margin: 0; }
+  .close { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--ink); }
+  .empty { color: var(--muted); }
+  .lines { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+  .lines :global(li) { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .lines :global(img) { width: 56px; height: 56px; }
+  .lines :global(.name) { font: 600 1.15rem/1.2 var(--serif); }
+  .lines :global(.meta) { font-size: 0.82rem; color: var(--muted); }
+  .lines :global(.qty) { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .lines :global(.qty button) { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--gold); background: var(--white); cursor: pointer; color: var(--ink); line-height: 1; }
+  .lines :global(.price) { font-weight: 500; }
+  footer { border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 12px; }
+  footer[hidden] { display: none; }
+  .total { display: flex; justify-content: space-between; font-size: 1.1rem; }
+  .note { font-size: 0.85rem; color: var(--muted); margin: 0; }
+  .clear { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.85rem; }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    background: var(--ink);
+    color: var(--white);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+
+<script>
+  type Line = { key: string; id: string; name: string; size: string; oz: number; price: number; img: string; qty: number };
+  const KEY = 'sip-society-order';
+  const $ = <T extends Element>(s: string) => document.querySelector(s) as T;
+  const dialog = $<HTMLDialogElement>('[data-cart]');
+  const money = (n: number) => `$${n.toFixed(2)}`;
+
+  const load = (): Line[] => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+  };
+  let lines: Line[] = load();
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(lines)); } catch {} };
+
+  function render() {
+    const count = lines.reduce((n, l) => n + l.qty, 0);
+    const total = lines.reduce((n, l) => n + l.qty * l.price, 0);
+    document.querySelectorAll<HTMLElement>('[data-cart-count]').forEach((el) => {
+      el.textContent = String(count);
+      el.hidden = count === 0;
+    });
+    $<HTMLElement>('[data-cart-empty]').hidden = count > 0;
+    $<HTMLElement>('[data-cart-footer]').hidden = count === 0;
+    $<HTMLElement>('[data-cart-total]').textContent = money(total);
+    const ul = $<HTMLUListElement>('[data-cart-lines]');
+    ul.replaceChildren(
+      ...lines.map((l) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<img src="${l.img}" alt="" width="56" height="56">
+          <div><div class="name"></div><div class="meta"></div>
+          <div class="qty"><button type="button" data-dec aria-label="One less">−</button><span></span><button type="button" data-inc aria-label="One more">+</button></div></div>
+          <div class="price"></div>`;
+        li.querySelector('.name')!.textContent = l.name;
+        li.querySelector('.meta')!.textContent = `${l.size} · ${l.oz} oz · ${money(l.price)} each`;
+        li.querySelector('.qty span')!.textContent = String(l.qty);
+        li.querySelector('.price')!.textContent = money(l.price * l.qty);
+        li.querySelector('[data-dec]')!.addEventListener('click', () => change(l.key, -1));
+        li.querySelector('[data-inc]')!.addEventListener('click', () => change(l.key, 1));
+        return li;
+      }),
+    );
+    // Order stub: builds an email with the order. Replace with real checkout later.
+    const body = lines.map((l) => `${l.qty} × ${l.name} (${l.size}, ${l.oz} oz) — ${money(l.price * l.qty)}`).join('\n');
+    const email = dialog.dataset.email;
+    $<HTMLAnchorElement>('[data-cart-send]').href =
+      `mailto:${email}?subject=${encodeURIComponent('Sip Society order request')}&body=${encodeURIComponent(
+        `Hi Sip Society!\n\nI'd like to order:\n\n${body}\n\nSubtotal: ${money(total)}\n\nName:\nPickup time:\n`,
+      )}`;
+  }
+
+  function change(key: string, delta: number) {
+    const l = lines.find((x) => x.key === key);
+    if (!l) return;
+    l.qty += delta;
+    lines = lines.filter((x) => x.qty > 0);
+    save();
+    render();
+  }
+
+  let toastTimer: number | undefined;
+  function toast(msg: string) {
+    const t = $<HTMLElement>('[data-toast]');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  window.addEventListener('sip:add', (e) => {
+    const item = (e as CustomEvent<Omit<Line, 'key' | 'qty'>>).detail;
+    const key = `${item.id}:${item.size}`;
+    const existing = lines.find((l) => l.key === key);
+    if (existing) existing.qty += 1;
+    else lines.push({ ...item, key, qty: 1 });
+    save();
+    render();
+    toast(`Added ${item.size} ${item.name}`);
+  });
+
+  document.querySelectorAll('[data-cart-open]').forEach((b) => b.addEventListener('click', () => dialog.showModal()));
+  $('[data-cart-close]').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+  $('[data-cart-clear]').addEventListener('click', () => { lines = []; save(); render(); });
+  window.addEventListener('storage', (e) => { if (e.key === KEY) { lines = load(); render(); } });
+
+  render();
+</script>

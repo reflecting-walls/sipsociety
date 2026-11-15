@@ -21,7 +21,11 @@ npm run build    # outputs the static site to dist/
 
 ## Ordering
 
-There is no payment backend yet. "Add to order" puts drinks in a cart that is saved in the browser. "Send order request" opens an email to the address in `menu.ts` with the order filled in. Swap this for Square, Toast or Stripe checkout later.
+There is no payment backend yet. "Add to order" puts drinks in a cart that is saved in the browser. At checkout the customer enters their name, email, and optionally phone, pickup time and notes, and "Send order request" emails the order to `order@sipsocietydrinks.com` through [Web3Forms](https://web3forms.com) (free, no server needed). Replying to that email replies to the customer.
+
+To turn it on: go to web3forms.com, enter `order@sipsocietydrinks.com`, copy the access key they email to that inbox, and paste it into `orderFormKey` in `src/data/menu.ts`. Until a key is set, the button falls back to opening the customer's own email app with the order filled in.
+
+Swap this for Square, Toast or Stripe checkout later.
 
 ## Placeholders to replace
 

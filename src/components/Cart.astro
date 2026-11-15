@@ -1,8 +1,8 @@
 ---
-import { contact } from '../data/menu';
+import { contact, orderFormKey } from '../data/menu';
 ---
 
-<dialog class="cart" data-cart aria-labelledby="cart-title" data-email={contact.email}>
+<dialog class="cart" data-cart aria-labelledby="cart-title" data-email={contact.email} data-form-key={orderFormKey}>
   <div class="cart-inner">
     <header>
       <h2 id="cart-title">Your order</h2>
@@ -12,10 +12,24 @@ import { contact } from '../data/menu';
     <p class="empty" data-cart-empty>Your order is empty. Pick a sip from the <a href="/menu/">menu</a>.</p>
     <ul class="lines" data-cart-lines></ul>
 
+    <div class="sent" data-cart-sent hidden>
+      <h3>Thank you!</h3>
+      <p>Your order is on its way to us. We'll email you to confirm a pickup time.</p>
+    </div>
+
     <footer data-cart-footer hidden>
       <div class="total"><span>Subtotal</span><strong data-cart-total>$0.00</strong></div>
       <p class="note">Online payment is coming soon. Send your order to us and we'll confirm a pickup time.</p>
-      <a class="btn" data-cart-send href="#">Send order request</a>
+      <form class="details" data-cart-form novalidate>
+        <label><span class="lbl">Your name</span><input name="name" autocomplete="name" required /></label>
+        <label><span class="lbl">Email</span><input name="email" type="email" autocomplete="email" required /></label>
+        <label><span class="lbl">Phone <span>(optional)</span></span><input name="phone" type="tel" autocomplete="tel" /></label>
+        <label><span class="lbl">Pickup time <span>(optional)</span></span><input name="pickup" placeholder="e.g. Saturday 10 am" /></label>
+        <label><span class="lbl">Notes <span>(optional)</span></span><textarea name="notes" rows="2"></textarea></label>
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <p class="error" data-cart-error role="alert" hidden></p>
+        <button class="btn" type="submit" data-cart-send>Send order request</button>
+      </form>
       <button type="button" class="clear" data-cart-clear>Clear order</button>
     </footer>
   </div>
@@ -55,6 +69,21 @@ import { contact } from '../data/menu';
   footer[hidden] { display: none; }
   .total { display: flex; justify-content: space-between; font-size: 1.1rem; }
   .note { font-size: 0.85rem; color: var(--muted); margin: 0; }
+  .details { display: grid; gap: 10px; }
+  .details label { display: grid; gap: 4px; font-size: 0.85rem; font-weight: 500; }
+  .details .lbl span { color: var(--muted); font-weight: 400; }
+  .details input, .details textarea { font: inherit; font-size: 0.95rem; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); color: var(--ink); }
+  .details input:focus, .details textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .details .hp { display: none; }
+  .details button[disabled] { opacity: 0.6; cursor: wait; }
+  .error { color: #a3324a; font-size: 0.85rem; margin: 0; }
+  .error :global(a) { color: inherit; }
+  .sent { text-align: center; padding: 24px 0; }
+  .sent[hidden] { display: none; }
+  .sent h3 { font: 600 1.6rem/1.2 var(--serif); margin: 0 0 8px; }
+  .cart-inner { overflow-y: auto; }
+  .lines { flex: 0 0 auto; overflow: visible; }
+  .empty { flex: 1; }
   .clear { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.85rem; }
   .toast {
     position: fixed;
@@ -114,14 +143,69 @@ import { contact } from '../data/menu';
         return li;
       }),
     );
-    // Order stub: builds an email with the order. Replace with real checkout later.
-    const body = lines.map((l) => `${l.qty} × ${l.name} (${l.size}, ${l.oz} oz) — ${money(l.price * l.qty)}`).join('\n');
-    const email = dialog.dataset.email;
-    $<HTMLAnchorElement>('[data-cart-send]').href =
-      `mailto:${email}?subject=${encodeURIComponent('Sip Society order request')}&body=${encodeURIComponent(
-        `Hi Sip Society!\n\nI'd like to order:\n\n${body}\n\nSubtotal: ${money(total)}\n\nName:\nPickup time:\n`,
-      )}`;
   }
+
+  const orderText = () =>
+    lines.map((l) => `${l.qty} × ${l.name} (${l.size}, ${l.oz} oz) — ${money(l.price * l.qty)}`).join('\n');
+  const subtotal = () => lines.reduce((n, l) => n + l.qty * l.price, 0);
+
+  // Fallback when no form key is set or the form service is down:
+  // open the customer's own email app with the order filled in.
+  function mailtoHref(d: Record<string, string>) {
+    return `mailto:${dialog.dataset.email}?subject=${encodeURIComponent('Sip Society order request')}&body=${encodeURIComponent(
+      `Hi Sip Society!\n\nI'd like to order:\n\n${orderText()}\n\nSubtotal: ${money(subtotal())}\n\nName: ${d.name || ''}\nPhone: ${d.phone || ''}\nPickup time: ${d.pickup || ''}\nNotes: ${d.notes || ''}\n`,
+    )}`;
+  }
+
+  const form = $<HTMLFormElement>('[data-cart-form]');
+  const errorEl = $<HTMLElement>('[data-cart-error]');
+  const sendBtn = $<HTMLButtonElement>('[data-cart-send]');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.hidden = true;
+    if (!form.reportValidity()) return;
+    const d = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    if (d.botcheck) return;
+    const key = dialog.dataset.formKey;
+    if (!key) { window.location.href = mailtoHref(d); return; }
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending…';
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: key,
+          subject: `New order from ${d.name} · ${money(subtotal())}`,
+          from_name: 'Sip Society website',
+          replyto: d.email, // hitting Reply answers the customer
+          Name: d.name,
+          Email: d.email,
+          Phone: d.phone || '—',
+          'Pickup time': d.pickup || '—',
+          Order: orderText(),
+          Subtotal: money(subtotal()),
+          Notes: d.notes || '—',
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.success) throw new Error(json.message || `HTTP ${res.status}`);
+      lines = [];
+      save();
+      form.reset();
+      render();
+      $<HTMLElement>('[data-cart-empty]').hidden = true;
+      $<HTMLElement>('[data-cart-sent]').hidden = false;
+    } catch {
+      errorEl.innerHTML = `Sorry, your order didn't send. Please try again, or <a href="${mailtoHref(d)}">email it to us</a>.`;
+      errorEl.hidden = false;
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send order request';
+    }
+  });
 
   function change(key: string, delta: number) {
     const l = lines.find((x) => x.key === key);
@@ -152,7 +236,13 @@ import { contact } from '../data/menu';
     toast(`Added ${item.size} ${item.name}`);
   });
 
-  document.querySelectorAll('[data-cart-open]').forEach((b) => b.addEventListener('click', () => dialog.showModal()));
+  document.querySelectorAll('[data-cart-open]').forEach((b) =>
+    b.addEventListener('click', () => {
+      $<HTMLElement>('[data-cart-sent]').hidden = true;
+      render();
+      dialog.showModal();
+    }),
+  );
   $('[data-cart-close]').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
   $('[data-cart-clear]').addEventListener('click', () => { lines = []; save(); render(); });

@@ -102,9 +102,10 @@ export const drinks: Drink[] = [
 
 export const money = (n: number) => `$${n.toFixed(2)}`;
 
-// PLACEHOLDER contact details used by the order stub and footer.
+// Contact details used by the footer and the order form.
+// (Phone, address and hours are still placeholders.)
 export const contact = {
-  email: 'orders@sipsociety.example',
+  email: 'order@sipsocietydrinks.com',
   phone: '(555) 010-2026',
   address: '123 Sweet Street, Your Town',
   hours: [
@@ -113,3 +114,10 @@ export const contact = {
     ['Sunday', '9:00 am – 4:00 pm'],
   ],
 };
+
+// Orders from the cart are emailed to contact.email through Web3Forms
+// (https://web3forms.com, free). Paste the access key Web3Forms emails to
+// order@sipsocietydrinks.com here. It is safe to keep in public code: it can
+// only send mail to that one address. While it is empty, the cart falls back
+// to opening the customer's own email app.
+export const orderFormKey = '';

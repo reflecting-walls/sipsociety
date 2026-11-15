@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Strawberry milk">
+  <circle cx="200" cy="200" r="190" fill="#FFF6E5"/>
+  <circle cx="200" cy="200" r="172" fill="none" stroke="#D4B483" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"/>
+  <ellipse cx="200" cy="332" rx="96" ry="14" fill="#F1DCC0"/>
+  <path d="M236 44l-28 120" stroke="#E8A6B4" stroke-width="12" stroke-linecap="round"/>
+  <path d="M236 44l-28 120" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-dasharray="10 12"/>
+  <path d="M130 100h140l-16 220a14 14 0 0 1-14 13h-80a14 14 0 0 1-14-13z" fill="#fff" stroke="#E6D2B0" stroke-width="4"/>
+  <path d="M136 150h128l-12 166a10 10 0 0 1-10 9h-84a10 10 0 0 1-10-9z" fill="#F9D3DC"/>
+  <path d="M136 150h128l-2 26H138z" fill="#FCE4EA"/>
+  <g fill="#fff" opacity=".85">
+    <rect x="160" y="190" width="30" height="30" rx="6" transform="rotate(12 175 205)"/>
+    <rect x="204" y="222" width="30" height="30" rx="6" transform="rotate(-10 219 237)"/>
+    <rect x="170" y="258" width="26" height="26" rx="6" transform="rotate(20 183 271)"/>
+  </g>
+  <g fill="#fff" opacity=".9"><circle cx="220" cy="190" r="4"/><circle cx="160" cy="240" r="3"/><circle cx="230" cy="290" r="3"/><circle cx="200" cy="170" r="3"/></g>
+  <g transform="translate(266 102)">
+    <circle r="40" fill="#E2465E"/><circle r="33" fill="#F48A9C"/>
+    <g stroke="#E2465E" stroke-width="3"><path d="M0-33V33M-33 0H33M-23-23L23 23M-23 23L23-23"/></g>
+    <circle r="5" fill="#E2465E"/>
+  </g>
+  <g fill="#D4B483"><circle cx="90" cy="130" r="5"/><circle cx="96" cy="290" r="4"/><circle cx="318" cy="280" r="5"/></g>
+</svg>

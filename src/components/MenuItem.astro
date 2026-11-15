@@ -2,20 +2,21 @@
 import type { Drink } from '../data/menu';
 import { money } from '../data/menu';
 
-interface Props { drink: Drink; index: number; }
-const { drink, index } = Astro.props;
+interface Props { drink: Drink; index: number; uid?: string; eager?: boolean; }
+// uid keeps ids and radio groups unique when a drink appears in more than one season.
+const { drink, index, uid = drink.id, eager = index === 0 } = Astro.props;
 const def = drink.sizes[1] ?? drink.sizes[0];
 ---
 
-<article class:list={['item', { flip: index % 2 === 1 }]} id={drink.id} data-drink={drink.id} data-name={drink.name} data-img={drink.image}>
+<article class:list={['item', { flip: index % 2 === 1 }]} id={uid} data-drink={drink.id} data-name={drink.name} data-img={drink.image}>
   <div class="media">
     <img
       src={drink.image}
       alt={drink.imageAlt}
       width="400"
       height="400"
-      loading={index === 0 ? 'eager' : 'lazy'}
-      fetchpriority={index === 0 ? 'high' : undefined}
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
       decoding="async"
     />
   </div>
@@ -49,7 +50,7 @@ const def = drink.sizes[1] ?? drink.sizes[0];
           <label>
             <input
               type="radio"
-              name={`size-${drink.id}`}
+              name={`size-${uid}`}
               value={s.id}
               checked={s.id === def.id}
               data-label={s.label}

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
-import { drinks, money } from '../data/menu';
+import { drinks as allDrinks, money } from '../data/menu';
+const drinks = allDrinks.filter((d) => !d.seasonal);
 ---
 
 <Base title="Home" description="Sip Society is a kids' beverage bar serving cozy cocoa, pink lemonade, berry smoothies and caffeine-free babyccinos, made with real ingredients.">

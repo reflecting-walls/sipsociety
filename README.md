@@ -21,7 +21,7 @@ npm run build    # outputs the static site to dist/
 
 ## Ordering
 
-There is no payment backend yet. "Add to order" puts drinks in a cart that is saved in the browser. At checkout the customer enters their name, picks a pickup date and time (only today onward, inside opening hours, Central time), and optionally adds a phone number and notes, and "Email my order" opens their own email app with a message to `order@sipsocietydrinks.com` already filled in. No third-party form service is involved, and replying to the email answers the customer. The address lives in `contact.email` in `src/data/menu.ts`. Pickup times come from `pickupHours` in the same file, so update it whenever `contact.hours` changes.
+There is no payment backend yet. "Add to order" puts drinks in a cart that is saved in the browser. At checkout the customer enters their name, picks a pickup date and time (only today onward, inside opening hours, Central time), and optionally adds a phone number and notes, and "Email my order" opens their own email app with a message to `order@sipsocietydrinks.com` already filled in. No third-party form service is involved, and replying to the email answers the customer. The address lives in `contact.email` in `src/data/menu.ts`. Pickup times (Mon–Sat 10 am–2 pm, closed Sunday) come from `pickupHours` in the same file, so update it whenever `contact.hours` changes.
 
 `order@sipsocietydrinks.com` is forwarded to Gmail with Cloudflare Email Routing; replies go out from Gmail using "Send mail as".
 

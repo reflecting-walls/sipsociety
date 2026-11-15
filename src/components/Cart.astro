@@ -197,6 +197,12 @@ import { contact, pickupHours } from '../data/menu';
     return out;
   }
 
+  function emptyLabel(v: string) {
+    if (!v) return 'Pick a date first';
+    const [open, close] = hours[parseDate(v).getDay()] || [0, 0];
+    return open >= close ? "We're closed this day" : 'No pickup times left this day';
+  }
+
   // withDefault: fill in the first open day when the date is empty or past.
   // Only done when the cart opens; on submit a missing or past date is
   // cleared instead, so the customer has to pick one themselves.
@@ -218,7 +224,7 @@ import { contact, pickupHours } from '../data/menu';
     timeSelect.replaceChildren(
       ...(slots.length
         ? [new Option('Choose a time', ''), ...slots.map((t) => new Option(timeLabel(t), String(t)))]
-        : [new Option(dateInput.value ? 'No pickup times left this day' : 'Pick a date first', '')]),
+        : [new Option(emptyLabel(dateInput.value), '')]),
     );
     timeSelect.value = slots.includes(Number(prev)) && prev !== '' ? prev : '';
   }

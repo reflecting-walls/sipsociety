@@ -197,14 +197,18 @@ import { contact, pickupHours } from '../data/menu';
     return out;
   }
 
-  function refreshPickup() {
+  // withDefault: fill in the first open day when the date is empty or past.
+  // Only done when the cart opens; on submit a missing or past date is
+  // cleared instead, so the customer has to pick one themselves.
+  function refreshPickup(withDefault = false) {
     const today = shopNow();
     const last = new Date(today);
     last.setDate(today.getDate() + MAX_DAYS_AHEAD);
     dateInput.min = isoDate(today);
     dateInput.max = isoDate(last);
     // Default to the first day that still has pickup times.
-    if (!dateInput.value || dateInput.value < dateInput.min) {
+    if (dateInput.value && (dateInput.value < dateInput.min || dateInput.value > dateInput.max)) dateInput.value = '';
+    if (withDefault && !dateInput.value) {
       const d = new Date(today);
       while (!slotsFor(isoDate(d)).length && d < last) d.setDate(d.getDate() + 1);
       dateInput.value = isoDate(d);
@@ -214,11 +218,11 @@ import { contact, pickupHours } from '../data/menu';
     timeSelect.replaceChildren(
       ...(slots.length
         ? [new Option('Choose a time', ''), ...slots.map((t) => new Option(timeLabel(t), String(t)))]
-        : [new Option('No pickup times left this day', '')]),
+        : [new Option(dateInput.value ? 'No pickup times left this day' : 'Pick a date first', '')]),
     );
     timeSelect.value = slots.includes(Number(prev)) && prev !== '' ? prev : '';
   }
-  dateInput.addEventListener('change', refreshPickup);
+  dateInput.addEventListener('change', () => refreshPickup());
 
   function pickupText(date: string, time: string) {
     if (!date || time === '') return '';
@@ -233,7 +237,7 @@ import { contact, pickupHours } from '../data/menu';
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    refreshPickup(); // drop a time that has passed while the cart was open
+    refreshPickup(); // drop a date or time that has passed while the cart was open
     if (!form.reportValidity()) return;
     const d = Object.fromEntries(new FormData(form)) as Record<string, string>;
     window.location.href = mailtoHref(d);
@@ -270,7 +274,7 @@ import { contact, pickupHours } from '../data/menu';
 
   document.querySelectorAll('[data-cart-open]').forEach((b) =>
     b.addEventListener('click', () => {
-      refreshPickup();
+      refreshPickup(true);
       dialog.showModal();
     }),
   );

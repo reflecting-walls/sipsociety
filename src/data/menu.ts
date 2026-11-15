@@ -102,9 +102,10 @@ export const drinks: Drink[] = [
 
 export const money = (n: number) => `$${n.toFixed(2)}`;
 
-// PLACEHOLDER contact details used by the order stub and footer.
+// Contact details used by the footer and the order email.
+// (Phone, address and hours are still placeholders.)
 export const contact = {
-  email: 'orders@sipsociety.example',
+  email: 'order@sipsocietydrinks.com',
   phone: '(555) 010-2026',
   address: '123 Sweet Street, Your Town',
   hours: [
@@ -113,3 +114,4 @@ export const contact = {
     ['Sunday', '9:00 am – 4:00 pm'],
   ],
 };
+

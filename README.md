@@ -21,7 +21,11 @@ npm run build    # outputs the static site to dist/
 
 ## Ordering
 
-There is no payment backend yet. "Add to order" puts drinks in a cart that is saved in the browser. "Send order request" opens an email to the address in `menu.ts` with the order filled in. Swap this for Square, Toast or Stripe checkout later.
+There is no payment backend yet. "Add to order" puts drinks in a cart that is saved in the browser. At checkout the customer enters their name (and optionally phone, pickup time and notes), and "Email my order" opens their own email app with a message to `order@sipsocietydrinks.com` already filled in. No third-party form service is involved, and replying to the email answers the customer. The address lives in `contact.email` in `src/data/menu.ts`.
+
+`order@sipsocietydrinks.com` is forwarded to Gmail with Cloudflare Email Routing; replies go out from Gmail using "Send mail as".
+
+Swap this for Square, Toast or Stripe checkout later.
 
 ## Placeholders to replace
 

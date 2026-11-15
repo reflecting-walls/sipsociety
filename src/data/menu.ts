@@ -248,3 +248,17 @@ export const contact = {
   ],
 };
 
+// Pickup window for each day, used by the order form's time picker.
+// Index 0 is Sunday. Times are minutes after midnight: [open, close].
+// Keep these in step with `contact.hours` above.
+const h = (hr: number, min = 0) => hr * 60 + min;
+export const pickupHours: [number, number][] = [
+  [h(9), h(16)], // Sunday
+  [h(7), h(18)], // Monday
+  [h(7), h(18)], // Tuesday
+  [h(7), h(18)], // Wednesday
+  [h(7), h(18)], // Thursday
+  [h(7), h(18)], // Friday
+  [h(8), h(18)], // Saturday
+];
+

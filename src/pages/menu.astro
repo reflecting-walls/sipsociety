@@ -10,7 +10,7 @@ const ordered = [...seasons.slice(start), ...seasons.slice(0, start)];
 const menus = ordered.map((s) => ({ season: s, items: drinks.filter((d) => d.seasons.includes(s.id)).sort((a, b) => Number(!!b.seasonal) - Number(!!a.seasonal)) }));
 ---
 
-<Base title="Menu" description="The Sip Society seasonal menu: cozy cocoa and babyccinos for winter and fall, pink lemonade and berry smoothies for spring and summer, plus seasonal specials, with ingredients, calories and prices.">
+<Base title="Menu" description="The Sip Society seasonal menu: cozy cocoa and babyccinos for winter and fall, pink lemonade and berry smoothies for spring and summer, plus seasonal specials, all dairy-free, with ingredients, calories and prices.">
   <section class="intro">
     <div class="container center">
       <p class="eyebrow">Our seasonal menu</p>
@@ -61,7 +61,7 @@ const menus = ordered.map((s) => ({ season: s, items: drinks.filter((d) => d.sea
   <section class="section section--blush">
     <div class="container center small">
       <h2>Good to know</h2>
-      <p>Seasonal specials are available while their season lasts. Calories are approximate and based on whole milk. Oat milk is available on request for any milk-based drink. Please tell us about allergies when you order, as all drinks are made in a shared kitchen.</p>
+      <p>Seasonal specials are available while their season lasts. Every drink is dairy-free: our creamy drinks are made with oat milk. Calories are approximate. Please tell us about allergies when you order, as all drinks are made in a shared kitchen.</p>
     </div>
   </section>
 </Base>

@@ -1,0 +1,9 @@
+// Cloudflare Workers config: serves the static Astro build from ./dist.
+// `previews` lets `wrangler preview` publish branch previews for pull requests.
+{
+  "name": "sipsociety",
+  "compatibility_date": "2026-11-01",
+  "build": { "command": "npm run build" },
+  "assets": { "directory": "./dist" },
+  "previews": {}
+}

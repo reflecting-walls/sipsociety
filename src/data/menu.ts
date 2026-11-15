@@ -236,15 +236,29 @@ export const drinks: Drink[] = [
 export const money = (n: number) => `$${n.toFixed(2)}`;
 
 // Contact details used by the footer and the order email.
-// (Phone, address and hours are still placeholders.)
+// (Phone and address are still placeholders.)
 export const contact = {
   email: 'order@sipsocietydrinks.com',
   phone: '(555) 010-2026',
   address: '123 Sweet Street, Your Town',
   hours: [
-    ['Mon – Fri', '7:00 am – 6:00 pm'],
-    ['Saturday', '8:00 am – 6:00 pm'],
-    ['Sunday', '9:00 am – 4:00 pm'],
+    ['Mon – Sat', '10:00 am – 2:00 pm'],
+    ['Sunday', 'Closed'],
   ],
 };
+
+// Pickup window for each day, used by the order form's time picker.
+// Index 0 is Sunday. Times are minutes after midnight: [open, close];
+// [0, 0] means closed.
+// Keep these in step with `contact.hours` above.
+const h = (hr: number, min = 0) => hr * 60 + min;
+export const pickupHours: [number, number][] = [
+  [0, 0], // Sunday: closed
+  [h(10), h(14)], // Monday
+  [h(10), h(14)], // Tuesday
+  [h(10), h(14)], // Wednesday
+  [h(10), h(14)], // Thursday
+  [h(10), h(14)], // Friday
+  [h(10), h(14)], // Saturday
+];
 

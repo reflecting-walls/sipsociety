@@ -1,8 +1,8 @@
 ---
-import { contact } from '../data/menu';
+import { contact, pickupHours } from '../data/menu';
 ---
 
-<dialog class="cart" data-cart aria-labelledby="cart-title" data-email={contact.email}>
+<dialog class="cart" data-cart aria-labelledby="cart-title" data-email={contact.email} data-hours={JSON.stringify(pickupHours)}>
   <div class="cart-inner">
     <header>
       <h2 id="cart-title">Your order</h2>
@@ -18,7 +18,10 @@ import { contact } from '../data/menu';
       <form class="details" data-cart-form novalidate>
         <label><span class="lbl">Your name</span><input name="name" autocomplete="name" required /></label>
         <label><span class="lbl">Phone <span>(optional)</span></span><input name="phone" type="tel" autocomplete="tel" /></label>
-        <label><span class="lbl">Pickup time <span>(optional)</span></span><input name="pickup" placeholder="e.g. Saturday 10 am" /></label>
+        <div class="pickup">
+          <label><span class="lbl">Pickup date</span><input name="date" type="date" required data-pickup-date /></label>
+          <label><span class="lbl">Pickup time</span><select name="time" required data-pickup-time></select></label>
+        </div>
         <label><span class="lbl">Notes <span>(optional)</span></span><textarea name="notes" rows="2"></textarea></label>
         <button class="btn" type="submit" data-cart-send>Email my order</button>
         <p class="note" data-cart-fallback>No email app? Send your order to <a data-cart-mailto></a>.</p>
@@ -67,6 +70,9 @@ import { contact } from '../data/menu';
   .details .lbl span { color: var(--muted); font-weight: 400; }
   .details input, .details textarea { font: inherit; font-size: 0.95rem; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); color: var(--ink); }
   .note a { color: inherit; }
+  .pickup { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .details select { font: inherit; font-size: 0.95rem; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); color: var(--ink); min-height: 42px; }
+  .details select:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
   .details input:focus, .details textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
   .cart-inner { overflow-y: auto; }
   .lines { flex: 0 0 auto; overflow: visible; }
@@ -142,8 +148,92 @@ import { contact } from '../data/menu';
     const subject = `Sip Society order${d.name ? ` from ${d.name}` : ''} · ${money(subtotal())}`;
     const body =
       `Hi Sip Society!\n\nI'd like to order:\n\n${orderText()}\n\nSubtotal: ${money(subtotal())}\n\n` +
-      `Name: ${d.name || ''}\nPhone: ${d.phone || ''}\nPickup time: ${d.pickup || ''}\nNotes: ${d.notes || ''}\n`;
+      `Name: ${d.name || ''}\nPhone: ${d.phone || ''}\nPickup: ${pickupText(d.date, d.time)}\nNotes: ${d.notes || ''}\n`;
     return `mailto:${dialog.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  // Pickup date and time. Dates before today can't be picked, and on today's
+  // date only times at least LEAD_MIN from now are offered.
+  const LEAD_MIN = 30;
+  const STEP_MIN = 15;
+  const MAX_DAYS_AHEAD = 30;
+  const hours: [number, number][] = JSON.parse(dialog.dataset.hours || '[]');
+  // The shop is in Illinois, so "today" and "now" use Central time no matter
+  // where the customer's device thinks it is.
+  const SHOP_TZ = 'America/Chicago';
+  function shopNow(): Date {
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: SHOP_TZ, hourCycle: 'h23',
+        year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric',
+      }).formatToParts(new Date()).map((x) => [x.type, x.value]),
+    );
+    return new Date(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+  }
+  const dateInput = $<HTMLInputElement>('[data-pickup-date]');
+  const timeSelect = $<HTMLSelectElement>('[data-pickup-time]');
+  const isoDate = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const parseDate = (v: string) => {
+    const [y, m, d] = v.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  };
+  const timeLabel = (mins: number) =>
+    new Date(2000, 0, 1, Math.floor(mins / 60), mins % 60).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  function slotsFor(v: string): number[] {
+    if (!v) return [];
+    const day = parseDate(v);
+    const now = shopNow();
+    if (isoDate(day) < isoDate(now)) return [];
+    const [open, close] = hours[day.getDay()] || [0, 0];
+    let start = open;
+    if (isoDate(day) === isoDate(now)) {
+      const earliest = now.getHours() * 60 + now.getMinutes() + LEAD_MIN;
+      start = Math.max(open, Math.ceil(earliest / STEP_MIN) * STEP_MIN);
+    }
+    const out: number[] = [];
+    for (let t = start; t <= close - STEP_MIN; t += STEP_MIN) out.push(t);
+    return out;
+  }
+
+  function emptyLabel(v: string) {
+    if (!v) return 'Pick a date first';
+    const [open, close] = hours[parseDate(v).getDay()] || [0, 0];
+    return open >= close ? "We're closed this day" : 'No pickup times left this day';
+  }
+
+  // withDefault: fill in the first open day when the date is empty or past.
+  // Only done when the cart opens; on submit a missing or past date is
+  // cleared instead, so the customer has to pick one themselves.
+  function refreshPickup(withDefault = false) {
+    const today = shopNow();
+    const last = new Date(today);
+    last.setDate(today.getDate() + MAX_DAYS_AHEAD);
+    dateInput.min = isoDate(today);
+    dateInput.max = isoDate(last);
+    // Default to the first day that still has pickup times.
+    if (dateInput.value && (dateInput.value < dateInput.min || dateInput.value > dateInput.max)) dateInput.value = '';
+    if (withDefault && !dateInput.value) {
+      const d = new Date(today);
+      while (!slotsFor(isoDate(d)).length && d < last) d.setDate(d.getDate() + 1);
+      dateInput.value = isoDate(d);
+    }
+    const prev = timeSelect.value;
+    const slots = slotsFor(dateInput.value);
+    timeSelect.replaceChildren(
+      ...(slots.length
+        ? [new Option('Choose a time', ''), ...slots.map((t) => new Option(timeLabel(t), String(t)))]
+        : [new Option(emptyLabel(dateInput.value), '')]),
+    );
+    timeSelect.value = slots.includes(Number(prev)) && prev !== '' ? prev : '';
+  }
+  dateInput.addEventListener('change', () => refreshPickup());
+
+  function pickupText(date: string, time: string) {
+    if (!date || time === '') return '';
+    const day = parseDate(date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    return `${day} at ${timeLabel(Number(time))}`;
   }
 
   const form = $<HTMLFormElement>('[data-cart-form]');
@@ -153,6 +243,7 @@ import { contact } from '../data/menu';
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    refreshPickup(); // drop a date or time that has passed while the cart was open
     if (!form.reportValidity()) return;
     const d = Object.fromEntries(new FormData(form)) as Record<string, string>;
     window.location.href = mailtoHref(d);
@@ -188,7 +279,10 @@ import { contact } from '../data/menu';
   });
 
   document.querySelectorAll('[data-cart-open]').forEach((b) =>
-    b.addEventListener('click', () => dialog.showModal()),
+    b.addEventListener('click', () => {
+      refreshPickup(true);
+      dialog.showModal();
+    }),
   );
   $('[data-cart-close]').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
